@@ -14,12 +14,12 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # Copy and install Python deps first (better layer caching)
-COPY ../lib /app/lib
-COPY ../routes /app/routes
-COPY ../static /app/static
-COPY ../templates /app/templates
-COPY ../app.py /app/app.py
-COPY ../requirements.txt /app/requirements.txt
+COPY lib /app/lib
+COPY routes /app/routes
+COPY static /app/static
+COPY templates /app/templates
+COPY app.py /app/app.py
+COPY requirements.txt /app/requirements.txt
 
 RUN python -m pip install --upgrade pip \
  && python -m pip install -r requirements.txt
