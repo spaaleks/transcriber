@@ -19,6 +19,16 @@ def discover_recipient_groups(rec_dir: Path) -> list[str]:
                 groups.add(g)
     return sorted(groups)
 
+def _parse_allowed_languages(raw: str | None) -> list[str] | None:
+    """Parse comma-separated allowlist. Returns None for '*' or empty."""
+    if not raw:
+        return None
+    raw = raw.strip()
+    if raw == "*":
+        return None
+    langs = [p.strip().lower() for p in raw.split(",") if p.strip()]
+    return langs or None
+
 @dataclass
 class Settings:
     # app
@@ -26,6 +36,7 @@ class Settings:
     db_path: Path
     model_size: str
     device: str
+    allowed_languages: list[str] | None
     compute_type: str
     cpu_threads: int
     host: str
@@ -78,6 +89,7 @@ class Settings:
             db_path=data_dir / "jobs.db",
             model_size=os.environ.get("WHISPER_MODEL", "small"),
             device=os.environ.get("WHISPER_DEVICE", "cpu"),
+            allowed_languages=_parse_allowed_languages(os.environ.get("WHISPER_ALLOWED_LANGUAGES")),
             compute_type=os.environ.get("WHISPER_COMPUTE", "int8"),
             cpu_threads=int(os.environ.get("WHISPER_THREADS", "8")),
             host=os.environ.get("APP_HOST", "127.0.0.1"),

@@ -163,6 +163,7 @@ class Worker:
             self.model_size, self.device, self.compute_type, self.cpu_threads,
             tr_cb, lambda m: self._log(job_id, m),
             lang_hint=None,
+            allowed_languages=getattr(self.settings, "allowed_languages", None),
         )
 
     def _maybe_notify(self, job_id: int, name: str, slug: str, txt_path: Path, group: str) -> None:

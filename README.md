@@ -152,6 +152,7 @@ Here’s what you can configure via `.env`:
 - `WHISPER_MODEL` – Model size (`tiny`, `base`, `small`, `medium`, `large-v3`)
 - `WHISPER_DEVICE` – `cpu` or `cuda`
 - `WHISPER_COMPUTE` – Compute type (`int8`, `float32`, `int8_float16`, `float16`)
+- `WHISPER_ALLOWED_LANGUAGES` – Comma-separated allowlist for language detection (e.g. `en,de`), or `*`/unset to allow any language
 - `WHISPER_THREADS` – CPU threads (integer)
 - `WORKER_CONCURRENCY` – Number of concurrent workers.
 
@@ -187,4 +188,3 @@ Here’s what you can configure via `.env`:
 
 ## License
 MIT
-

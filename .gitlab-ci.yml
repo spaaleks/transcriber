@@ -2,11 +2,14 @@ stages:
   - docker_build
   - repo-sync
 
+default:
+  image: docker:20.10
+  services:
+    - docker:20.10-dind
+
 .build_template:
   stage: docker_build
-  image: docker:latest
-  services:
-    - docker:dind
+  image: docker:20.10
   script:
     - |
       if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
