@@ -67,6 +67,8 @@ class Settings:
     webhook_bearer: str | None = None
     webhook_timeout: int = 15
     webhook_verify: bool = True
+    # incoming webhook
+    incoming_webhook_token: str | None = None
 
     @property
     def smtp_from_header(self) -> str | None:
@@ -118,7 +120,8 @@ class Settings:
             webhook_url=os.environ.get("WEBHOOK_URL"),
             webhook_bearer=os.environ.get("WEBHOOK_BEARER"),
             webhook_timeout=int(os.environ.get("WEBHOOK_TIMEOUT", "15")),
-            webhook_verify=os.environ.get("WEBHOOK_VERIFY", "1") not in ("0","false","False")
+            webhook_verify=os.environ.get("WEBHOOK_VERIFY", "1") not in ("0","false","False"),
+            incoming_webhook_token=os.environ.get("INCOMING_WEBHOOK_TOKEN"),
         )
         mbf = os.environ.get("MAIL_BODY_FILE")
         if mbf and Path(mbf).exists():
