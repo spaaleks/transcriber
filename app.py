@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import argparse
+import sys
 from flask import Flask
 from lib.settings import Settings
 from lib.db import db_init
@@ -9,11 +10,21 @@ from lib.auth import requires_auth
 from lib.outbox import Mailer
 from routes import register_routes
 
+def base_dir() -> Path:
+    bundle = getattr(sys, "_MEIPASS", None)
+    return Path(bundle) if bundle else Path(__file__).resolve().parent
+
 def create_app(settings: Settings):
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     db_init(settings.db_path)
 
-    app = Flask(__name__)
+    root = base_dir()
+    app = Flask(
+        __name__,
+        root_path=str(root),
+        template_folder=str(root / "templates"),
+        static_folder=str(root / "static"),
+    )
     app.config["MAX_CONTENT_LENGTH"] = settings.upload_max_mb * 1024 * 1024
 
     @app.before_request
