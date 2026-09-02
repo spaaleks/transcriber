@@ -1,0 +1,10 @@
+services:
+  transcriber:
+    image: spaaleks/transcriber:latest
+    container_name: spal-transcriber
+    ports:
+      - "15551:15551"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./.env:/app/.env:ro
