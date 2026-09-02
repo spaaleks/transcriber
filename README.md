@@ -1,7 +1,6 @@
-
 ![Screenshot](./static/images/screenshot.png)
 
-![](https://img.shields.io/badge/Version-v0.0.1-blue?style=for-the-badge&logo=github)
+![](https://img.shields.io/badge/Version-v1.0.1-blue?style=for-the-badge&logo=github)
 
 # Spal.Transcriber
 
@@ -48,17 +47,17 @@ Then use Docker Compose:
 
 ```yaml
 services:
-  transcriber:
-    image: spaleks/transcriber:latest
-    # or if you prefer quay.io:
-    # image: quay.io/spaleks/transcriber:latest
-    container_name: spal-transcriber
-    ports:
-      - "15551:15551"
-    volumes:
-      - ./data:/app/data
-      - ./config:/app/config
-      - ./.env:/app/.env:ro
+    transcriber:
+        image: spaaleks/transcriber:latest
+        # or if you prefer quay.io:
+        # image: quay.io/spaaleks/transcriber:latest
+        container_name: spal-transcriber
+        ports:
+            - "15551:15551"
+        volumes:
+            - ./data:/app/data
+            - ./config:/app/config
+            - ./.env:/app/.env:ro
 ```
 
 ---
@@ -92,6 +91,7 @@ config/
 Inside each file, list one email address per line. Lines starting with `#` are ignored.
 
 ---
+
 ## Webhooks (optional)
 
 If configured, a webhook is called when a job finishes. The transcript is sent as `multipart/form-data` with metadata.
@@ -100,38 +100,37 @@ If configured, a webhook is called when a job finishes. The transcript is sent a
 
 Set these in `.env`:
 
-* `WEBHOOK_URL` – target endpoint (if unset, webhooks are disabled)
-* `WEBHOOK_BEARER` – optional token for the `Authorization Bearer`
-* `WEBHOOK_TIMEOUT` – request timeout in seconds (default: `15`)
-* `WEBHOOK_VERIFY` – TLS verification (`1` = verify, `0` = skip)
+- `WEBHOOK_URL` – target endpoint (if unset, webhooks are disabled)
+- `WEBHOOK_BEARER` – optional token for the `Authorization Bearer`
+- `WEBHOOK_TIMEOUT` – request timeout in seconds (default: `15`)
+- `WEBHOOK_VERIFY` – TLS verification (`1` = verify, `0` = skip)
 
 ### When it fires
 
-* Automatically after a job reaches `done`.
-* Manually via a button in the GUI.
+- Automatically after a job reaches `done`.
+- Manually via a button in the GUI.
 
 ### HTTP request
 
-* Method: `POST`
-* Content-Type: `multipart/form-data`
-* Parts:
-
-  * `metadata`: JSON string with job info (see below)
-  * `file`: transcript as `text/plain` (`<slug>.txt`)
+- Method: `POST`
+- Content-Type: `multipart/form-data`
+- Parts:
+    - `metadata`: JSON string with job info (see below)
+    - `file`: transcript as `text/plain` (`<slug>.txt`)
 
 Example `metadata` JSON:
 
 ```json
 {
-  "slug": "meeting-2025-09-26",
-  "name": "Weekly Meeting",
-  "job_id": 123,
-  "recipient_group": "Team",
-  "created_at": "2025-09-26 10:05:11",
-  "updated_at": "2025-09-26 10:22:44",
-  "source": "spal.transcriber",
-  "status": "done",
-  "filename": "meeting-2025-09-26.txt"
+    "slug": "meeting-2025-09-26",
+    "name": "Weekly Meeting",
+    "job_id": 123,
+    "recipient_group": "Team",
+    "created_at": "2025-09-26 10:05:11",
+    "updated_at": "2025-09-26 10:22:44",
+    "source": "spal.transcriber",
+    "status": "done",
+    "filename": "meeting-2025-09-26.txt"
 }
 ```
 
@@ -142,6 +141,7 @@ Example `metadata` JSON:
 Here’s what you can configure via `.env`:
 
 ### App
+
 - `APP_DATA_DIR` – Directory for storing jobs and outputs (default: `./data`)
 - `APP_HOST` – Host to bind (default: `127.0.0.1`)
 - `PORT` – Port to bind (default: `15551`)
@@ -149,6 +149,7 @@ Here’s what you can configure via `.env`:
 - `APP_AUTH_PASS` – Password for Basic Auth
 
 ### Whisper
+
 - `WHISPER_MODEL` – Model size (`tiny`, `base`, `small`, `medium`, `large-v3`)
 - `WHISPER_DEVICE` – `cpu` or `cuda`
 - `WHISPER_COMPUTE` – Compute type (`int8`, `float32`, `int8_float16`, `float16`)
@@ -157,6 +158,7 @@ Here’s what you can configure via `.env`:
 - `WORKER_CONCURRENCY` – Number of concurrent workers.
 
 ### SMTP / Email
+
 - `AUTO_SEND_EMAIL` – If `1`, emails are sent automatically after transcription (default: `0`)
 - `SMTP_HOST` – SMTP server hostname
 - `SMTP_PORT` – SMTP port (default: `587`)
@@ -169,10 +171,12 @@ Here’s what you can configure via `.env`:
 - `SMTP_VERIFY` – Verify server certificate (`1` = yes, `0` = no)
 
 ### Recipients
+
 - `RECIPIENTS_DIR` – Directory containing recipient list files (default: `./config`)
 - `RECIPIENTS_FILE` – Path to main recipients file (default: `./config/recipients.txt`)
 
 ### Mail template
+
 - `MAIL_SUBJECT` – Email subject (supports `{name}`, `{slug}` placeholders)
 - `MAIL_BODY` – Email body (supports `{name}`, `{slug}`, supports `\n`)
 - `MAIL_BODY_FILE` – Optional path to a file containing email body
@@ -180,6 +184,7 @@ Here’s what you can configure via `.env`:
 ---
 
 ## Privacy notice
+
 - All files are stored and processed **locally**.
 - Nothing is uploaded to third-party servers.
 - Please always respect the privacy of speakers and only process content you are allowed to handle.
@@ -187,4 +192,5 @@ Here’s what you can configure via `.env`:
 ---
 
 ## License
+
 MIT
