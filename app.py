@@ -62,7 +62,16 @@ def parse_args():
     parser.add_argument("--device", default=None)
     parser.add_argument("--compute", default=None)
     parser.add_argument("--threads", type=int, default=None)
+    parser.add_argument("--server", default=None, choices=["waitress", "flask"])
     return parser.parse_args()
+
+def serve(app, s):
+    print(f"Listening on http://{s.host}:{s.port}")
+    if s.web_server == "flask":
+        app.run(host=s.host, port=s.port, debug=False)
+        return
+    from waitress import serve as waitress_serve
+    waitress_serve(app, host=s.host, port=s.port, threads=s.web_threads)
 
 if __name__ == "__main__":
     s = Settings.from_env()
@@ -76,7 +85,12 @@ if __name__ == "__main__":
     if args.device: s.device = args.device
     if args.compute: s.compute_type = args.compute
     if args.threads: s.cpu_threads = args.threads
+    if args.server: s.web_server = args.server
+
+    if s.use_remote_transcription:
+        print(f"Transcription backend: remote ({s.transcribe_api_base}, model={s.transcribe_model}) — local Whisper disabled")
+    else:
+        print(f"Transcription backend: local Whisper (model={s.model_size}, device={s.device}, compute={s.compute_type})")
 
     app = create_app(s)
-    print(f"Listening on http://{s.host}:{s.port}")
-    app.run(host=s.host, port=s.port, debug=False)
+    serve(app, s)

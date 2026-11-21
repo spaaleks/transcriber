@@ -1,6 +1,6 @@
 ![Screenshot](./static/images/screenshot.png)
 
-![](https://img.shields.io/badge/Version-v1.0.1-blue?style=for-the-badge&logo=github)
+![](https://img.shields.io/badge/Version-v1.0.2-blue?style=for-the-badge&logo=github)
 
 # Spal.Transcriber
 
@@ -12,7 +12,7 @@ It runs locally, so your audio/video never leaves your machine or server.
 ## Features
 
 - Upload local files (`.mp4`, `.mp3`, `.wav`, …)
-- Automatic transcription using [faster-whisper](https://github.com/guillaumekln/faster-whisper)
+- Automatic transcription using local [faster-whisper](https://github.com/guillaumekln/faster-whisper), or an external OpenAI-compatible endpoint (e.g. [LiteLLM](https://github.com/BerriAI/litellm) fronting Whisper/ElevenLabs) — in external mode the local model never loads, keeping RAM low
 - Job queue with progress tracking
 - Download transcripts as `.txt`
 - Optional email delivery (SMTP, with group support)
@@ -37,6 +37,8 @@ python app.py
 ```
 
 Then open [http://localhost:15551](http://localhost:15551).
+
+To offload transcription to an external OpenAI-compatible endpoint (so the local Whisper model never loads), set `TRANSCRIBE_API_BASE` (e.g. `http://litellm:4000/v1`) and optionally `TRANSCRIBE_API_KEY` / `TRANSCRIBE_MODEL`.
 
 ---
 
@@ -148,7 +150,22 @@ Here’s what you can configure via `.env`:
 - `APP_AUTH_USER` – Username for Basic Auth
 - `APP_AUTH_PASS` – Password for Basic Auth
 
-### Whisper
+### Transcription backend
+
+The app can transcribe either locally (faster-whisper, default) or by calling an external **OpenAI-compatible** endpoint such as [LiteLLM](https://github.com/BerriAI/litellm) in front of Whisper or ElevenLabs.
+
+In **remote** mode the local Whisper model is never imported or loaded, so RAM stays low — useful when the heavy transcription runs on another host behind LiteLLM.
+
+- `TRANSCRIBE_BACKEND` – `local` (default) or `remote`. If `TRANSCRIBE_API_BASE` is set and this is unset, `remote` is assumed.
+- `TRANSCRIBE_API_BASE` – Base URL of the OpenAI-compatible API, e.g. `http://litellm:4000/v1`. The app posts to `<base>/audio/transcriptions`.
+- `TRANSCRIBE_API_KEY` – Bearer token for the endpoint (optional).
+- `TRANSCRIBE_MODEL` – Model name passed to the endpoint (default: `whisper-1`).
+- `TRANSCRIBE_TIMEOUT` – Request timeout in seconds (default: `600`).
+- `TRANSCRIBE_VERIFY` – TLS verification (`1` = verify, `0` = skip).
+
+`WHISPER_ALLOWED_LANGUAGES` is honored in both modes.
+
+### Whisper (local backend only)
 
 - `WHISPER_MODEL` – Model size (`tiny`, `base`, `small`, `medium`, `large-v3`)
 - `WHISPER_DEVICE` – `cpu` or `cuda`

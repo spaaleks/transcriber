@@ -16,14 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Ensure build script is executable
         run: chmod +x bin/buildAnyPlatform.sh
 
-      - name: Build linux/amd64 and linux/arm64 binaries
-        run: bin/buildAnyPlatform.sh linux/amd64 linux/arm64
+      - name: Build linux/amd64 binary
+        run: bin/buildAnyPlatform.sh linux/amd64
 
       - name: Upload binaries
         uses: actions/upload-artifact@v4
@@ -31,7 +28,6 @@ jobs:
           name: transcriber-binaries
           path: |
             dist/transcriber.linux-amd64
-            dist/transcriber.linux-arm64
           if-no-files-found: error
 
       - name: Docker build smoke test (amd64)

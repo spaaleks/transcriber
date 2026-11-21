@@ -19,6 +19,20 @@ def discover_recipient_groups(rec_dir: Path) -> list[str]:
                 groups.add(g)
     return sorted(groups)
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() not in ("0", "false", "no", "off", "")
+
+def _resolve_backend(raw: str | None, api_base: str | None) -> str:
+    if raw:
+        v = raw.strip().lower()
+        if v in ("remote", "openai", "external", "litellm"):
+            return "remote"
+        return "local"
+    return "remote" if api_base else "local"
+
 def _parse_allowed_languages(raw: str | None) -> list[str] | None:
     """Parse comma-separated allowlist. Returns None for '*' or empty."""
     if not raw:
@@ -39,6 +53,14 @@ class Settings:
     allowed_languages: list[str] | None
     compute_type: str
     cpu_threads: int
+    transcribe_backend: str
+    transcribe_api_base: str | None
+    transcribe_api_key: str | None
+    transcribe_model: str
+    transcribe_timeout: int
+    transcribe_verify: bool
+    web_server: str
+    web_threads: int
     host: str
     port: int
     recipients_dir: Path
@@ -71,6 +93,10 @@ class Settings:
     incoming_webhook_token: str | None = None
 
     @property
+    def use_remote_transcription(self) -> bool:
+        return self.transcribe_backend == "remote"
+
+    @property
     def smtp_from_header(self) -> str | None:
         """Return proper From header value."""
         if not self.smtp_sender:
@@ -85,6 +111,9 @@ class Settings:
         recipients_dir = Path(os.environ.get("RECIPIENTS_DIR", "./config")).resolve()
         recipients_file = Path(os.environ.get("RECIPIENTS_FILE", str(recipients_dir / "recipients.txt")))
 
+        transcribe_api_base = os.environ.get("TRANSCRIBE_API_BASE") or None
+        transcribe_backend = _resolve_backend(os.environ.get("TRANSCRIBE_BACKEND"), transcribe_api_base)
+
         s = Settings(
             # app
             data_dir=data_dir,
@@ -94,6 +123,14 @@ class Settings:
             allowed_languages=_parse_allowed_languages(os.environ.get("WHISPER_ALLOWED_LANGUAGES")),
             compute_type=os.environ.get("WHISPER_COMPUTE", "int8"),
             cpu_threads=int(os.environ.get("WHISPER_THREADS", "8")),
+            transcribe_backend=transcribe_backend,
+            transcribe_api_base=transcribe_api_base,
+            transcribe_api_key=os.environ.get("TRANSCRIBE_API_KEY") or None,
+            transcribe_model=os.environ.get("TRANSCRIBE_MODEL", "whisper-1"),
+            transcribe_timeout=int(os.environ.get("TRANSCRIBE_TIMEOUT", "600")),
+            transcribe_verify=_env_bool("TRANSCRIBE_VERIFY", True),
+            web_server=os.environ.get("WEB_SERVER", "waitress").strip().lower(),
+            web_threads=int(os.environ.get("WEB_THREADS", "8")),
             host=os.environ.get("APP_HOST", "127.0.0.1"),
             port=int(os.environ.get("PORT", "15551")),
             upload_max_mb = int(os.environ.get("UPLOAD_MAX_MB", "2048")),

@@ -2,7 +2,7 @@ flask
 yt-dlp
 faster-whisper
 ffmpeg-python
-gunicorn
+waitress
 python-dotenv
 werkzeug
 beautifulsoup4

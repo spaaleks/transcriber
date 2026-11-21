@@ -4,8 +4,11 @@ from pathlib import Path
 from .utils import now_iso
 
 def db_conn(db_path: Path):
-    con = sqlite3.connect(db_path, check_same_thread=False)
+    con = sqlite3.connect(db_path, timeout=15.0, check_same_thread=False)
     con.row_factory = sqlite3.Row
+    con.execute("PRAGMA busy_timeout=15000")
+    con.execute("PRAGMA journal_mode=WAL")
+    con.execute("PRAGMA synchronous=NORMAL")
     con.execute("PRAGMA foreign_keys=ON")
     return con
 

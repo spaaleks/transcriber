@@ -7,7 +7,6 @@ cd "$ROOT_DIR"
 IMAGE_NAME="transcriber"
 DEFAULT_PLATFORMS=(
   "linux/amd64"
-  "linux/arm64"
 )
 
 if [[ "$#" -gt 0 ]]; then
@@ -48,6 +47,7 @@ for TARGET_PLATFORM in "${PLATFORMS[@]}"; do
         --collect-all huggingface_hub \
         --collect-all av \
         --collect-all yt_dlp \
+        --collect-all waitress \
         app.py
       cp dist/transcriber "/src/${OUTPUT_PATH}"
     '
