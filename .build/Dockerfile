@@ -25,6 +25,7 @@ RUN uv run --no-project --with-requirements requirements.txt --with pyinstaller 
       --collect-all huggingface_hub \
       --collect-all av \
       --collect-all yt_dlp \
+      --collect-all waitress \
       app.py
 
 FROM debian:trixie-slim AS runtime

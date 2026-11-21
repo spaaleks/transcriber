@@ -10,7 +10,6 @@ from lib.utils import now_iso
 
 from .db import db_conn, update_job, append_log, job_dir
 from .download import download_with_resume_and_validation
-from .transcribe import transcribe_to_txt
 from .emailer import notify_recipients
 from .webhook import send_transcript_webhook
 
@@ -158,13 +157,26 @@ class Worker:
             with db_conn(self.db_path) as con2:
                 update_job(con2, job_id, progress=50 + frac * 50)
 
-        transcribe_to_txt(
-            media_path, txt_path,
-            self.model_size, self.device, self.compute_type, self.cpu_threads,
-            tr_cb, lambda m: self._log(job_id, m),
-            lang_hint=None,
-            allowed_languages=getattr(self.settings, "allowed_languages", None),
-        )
+        log_cb = lambda m: self._log(job_id, m)
+        allowed = getattr(self.settings, "allowed_languages", None)
+
+        if self.settings and getattr(self.settings, "use_remote_transcription", False):
+            from .transcribe_remote import transcribe_to_txt_remote
+            transcribe_to_txt_remote(
+                media_path, txt_path, self.settings,
+                tr_cb, log_cb,
+                lang_hint=None,
+                allowed_languages=allowed,
+            )
+        else:
+            from .transcribe import transcribe_to_txt
+            transcribe_to_txt(
+                media_path, txt_path,
+                self.model_size, self.device, self.compute_type, self.cpu_threads,
+                tr_cb, log_cb,
+                lang_hint=None,
+                allowed_languages=allowed,
+            )
 
     def _maybe_notify(self, job_id: int, name: str, slug: str, txt_path: Path, group: str) -> None:
         try:
