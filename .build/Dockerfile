@@ -39,6 +39,7 @@ ENV APP_DATA_DIR=/app/data \
     RECIPIENTS_DIR=/app/config \
     APP_HOST=0.0.0.0 \
     PORT=15551 \
+    PYTHONUNBUFFERED=1 \
     PATH=/usr/local/bin:$PATH
 EXPOSE 15551
 ENTRYPOINT ["/usr/local/bin/transcriber"]
