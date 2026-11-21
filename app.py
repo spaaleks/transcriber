@@ -74,6 +74,12 @@ def serve(app, s):
     waitress_serve(app, host=s.host, port=s.port, threads=s.web_threads)
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(line_buffering=True)
+        except Exception:
+            pass
+
     s = Settings.from_env()
     args = parse_args()
     if args.host: s.host = args.host
